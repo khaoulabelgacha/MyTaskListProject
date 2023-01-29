@@ -54,7 +54,7 @@ public final class TaskList implements Runnable {
                 showTask();
                 return;
             case "add":
-                addTask(commandRest[1]);
+                addCommand(commandRest[1]);
                 return;
             case "check":
                 checkTask(commandRest[1]);
@@ -81,16 +81,15 @@ public final class TaskList implements Runnable {
 
     private void addCommand(String commandLine) {
         String[] subcommandRest = commandLine.split(" ", 2);
-        Stream.of("project", "task")
-                .filter(subcommand -> subcommand.equals(subcommandRest[0]))
-                .findFirst()
-                .ifPresent(subcommand -> {
-                    if (subcommand.equals("project")) {
-                        addProject(subcommandRest[1]);
-                    } else {
-                        addTask(subcommandRest[1]);
-                    }
-                });
+        String subcommand = subcommandRest[0];
+        if (subcommand.equals("project")) {
+            addProject(subcommandRest[1]);
+            return;
+        }
+        if (subcommand.equals("task")) {
+            String[] projectTask = subcommandRest[1].split(" ", 2);
+            addTask(projectTask[0], projectTask[1]);
+        }
     }
 
 
@@ -120,13 +119,15 @@ public final class TaskList implements Runnable {
                 .flatMap(List::stream)
                 .filter(task -> task.id == id)
                 .findFirst()
-                .ifPresent(task -> task.done=done);
+                .ifPresentOrElse(task -> task.done = done,
+                () -> output.printlf("Could not find a task with an ID of %d.", id));
+        
     }
 
 
     private void help() {
         output.println("Commands:");
-        COMMANDS.forEach(command -> output.println("  " + command));
+        COMMANDS.forEach(command -> out.println("  " + command));
     }
 
     private static final List<String> COMMANDS = Arrays.asList("show", "add", "check", "uncheck", "help", "quit");
