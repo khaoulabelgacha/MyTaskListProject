@@ -16,7 +16,7 @@ public final class TaskList implements Runnable {
     private final BufferedReader input;
     private final PrintWriter output;
 
-    private long lastTaskId = 0;
+    private long lastId = 0;
 
     public static void main(String[] args) throws Exception {
         BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
